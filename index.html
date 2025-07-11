@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EVSI Token Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.6.2/dist/ethers.umd.min.js"></script>
+  <style>
+    body { background: #000; color: #0f0; font-family: monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+    .card { background: #111; padding: 2rem; border-radius: 1rem; box-shadow: 0 0 20px #0f0; max-width: 500px; text-align: center; }
+    h1 { font-size: 2rem; margin-bottom: 1rem; }
+    .info { margin: 0.5rem 0; }
+    .label { font-weight: bold; color: #fff; }
+    .value { color: #0f0; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>EVSI Token Dashboard</h1>
+    <div class="info"><span class="label">Token:</span> <span class="value">Evoke Super Intelligence (EVSI)</span></div>
+    <div class="info"><span class="label">Faucet Balance:</span> <span class="value" id="faucetBalance">Loading...</span></div>
+    <div class="info"><span class="label">Faucet Address:</span> <span class="value">0xb12...a001</span></div>
+    <div class="info"><span class="label">Token Contract:</span> <span class="value">0x181...2B3A</span></div>
+    <div class="info"><span class="label">Network:</span> <span class="value">Monad Testnet</span></div>
+  </div>
+
+  <script>
+    const tokenAddress = "0x181979596C43587843Fe0FFBc4bE3B7366722B3A";
+    const faucetAddress = "0xb12eb85a44554c1cab8a9b9c5b7a56416eafa001";
+
+    const ERC20_ABI = ["function balanceOf(address) view returns (uint256)", "function decimals() view returns (uint8)"];
+
+    async function loadDashboard() {
+      if (!window.ethereum) return alert("MetaMask required");
+      await ethereum.request({ method: "eth_requestAccounts" });
+
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const token = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
+
+      const balanceRaw = await token.balanceOf(faucetAddress);
+      const decimals = await token.decimals();
+      const balance = ethers.formatUnits(balanceRaw, decimals);
+
+      document.getElementById("faucetBalance").innerText = `${balance} EVSI`;
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>
